@@ -1,0 +1,91 @@
+#!/usr/bin/env rake
+Rake::TaskManager.record_task_metadata = true
+Dir.glob('lib/tasks/*.rake').each { |r| load r }
+
+require 'rubygems'
+require 'bundler'
+
+# Set default env
+ENV['RACK_ENV'] ||= 'development'
+
+# Setup load paths
+Bundler.require
+
+$LOAD_PATH.unshift File.dirname(__FILE__) + '/../../lib'
+$LOAD_PATH.unshift File.dirname(__FILE__) unless $LOAD_PATH.include?(File.dirname(__FILE__))
+
+require 'resque'
+require 'resque/tasks'
+
+require './jobs/lambda.rb'
+
+# Run before any rake tasks
+desc 'Rake: run before all tasks'
+task :before do
+  `find . -name ".DS_Store" -print0 | xargs -0 rm -rf`
+  `find . -name "._*" -print0 | xargs -0 rm -rf`
+  system 'clear'
+end
+
+desc 'List all rake tasks'
+task :default do
+  puts 'Rake Tasks:'.green
+  system 'rake -T'
+end
+task default: :before
+
+desc 'purge'
+task :purge do
+  Resque.redis = ENV['REDIS_DB']
+  # see http://stackoverflow.com/questions/5880962/how-to-destroy-jobs-enqueued-by-resque-workers - old version
+  # see https://github.com/defunkt/resque/issues/49
+  # see http://redis.io/commands - new commands
+
+  ap Resque.redis
+
+  ap Resque.queues
+
+  queues = Resque.queues
+  queues.each do |queue_name|
+    puts "Clearing #{queue_name}..."
+    Resque.remove_queue("queue:#{queue_name}")
+  end
+
+  puts 'Clearing delayed...'
+  Resque.redis.keys('delayed:*').each do |key|
+    Resque.redis.del key.to_s
+  end
+  Resque.redis.del 'delayed_queue_schedule'
+
+  puts 'Clearing stats...'
+  Resque.redis.set 'stat:failed', 0
+  Resque.redis.set 'stat:processed', 0
+
+  puts 'Clearing zombie workers...'
+  Resque.workers.each(&:prune_dead_workers)
+end
+task purge: :before
+
+desc 'Environment'
+task :environment do
+  Resque.redis = ENV['REDIS_DB']
+end
+task environment: :before
+
+desc 'Workers'
+task :workers do
+  threads = []
+
+  Resque.redis = ENV['REDIS_DB']
+
+  ENV["QUEUE"] = "*"
+
+  4.times do
+    threads << Thread.new do
+      system "QUEUE='*' rake environment resque:work"
+    end
+  end
+
+  threads.each { |thread| thread.join }
+end
+task workers: :before

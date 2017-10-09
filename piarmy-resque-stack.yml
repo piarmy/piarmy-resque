@@ -1,0 +1,51 @@
+# `docker stack deploy -c /home/pi/images/piarmy-resque-stack/piarmy-resque-stack.yml piarmy`
+
+version: '3'
+
+services:
+
+  redis:
+    image: mattwiater/piarmy-redis:latest
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        delay: 10s
+        max_attempts: 10
+        window: 60s
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    networks:
+      - piarmy
+    volumes:
+      - /home/pi/images/piarmy-resque-stack/redis/containerFiles:/home/redis
+
+  resque:
+    image: mattwiater/piarmy-resque:latest
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        delay: 10s
+        max_attempts: 10
+        window: 60s
+    command: bash /home/resque/www/start.sh
+    ports:
+      - "3000:3000"
+    environment:
+      REDIS_DB: redis:6379
+    networks:
+      - piarmy
+    volumes:
+      - /home/pi/images/piarmy-resque-stack/resque/containerFiles:/home/resque/www
+
+networks:  
+  piarmy:
+    external: true
+
+volumes:
+  data:
+    driver: local

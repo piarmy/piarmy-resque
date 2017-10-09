@@ -1,0 +1,12 @@
+source 'https://rubygems.org'
+ruby '2.3.3'
+
+gem 'dotenv', '2.1.1'
+gem 'i18n', '0.7.0'
+gem 'json', '2.0.2'
+gem 'rake', '11.2.2'
+
+gem 'awesome_print', '1.7.0'
+
+gem 'resque'
+gem 'resque-status'

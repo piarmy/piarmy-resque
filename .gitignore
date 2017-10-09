@@ -1,0 +1,3 @@
+resque/containerFiles/workers.log
+resque/containerFiles/jobs.log
+redis/containerFiles/appendonly.aof
