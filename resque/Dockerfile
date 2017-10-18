@@ -30,4 +30,4 @@ RUN /bin/bash -l -c "source ~/.rvm/scripts/rvm && gem install bundler --no-ri --
 
 EXPOSE 3000
 
-CMD ["top"]
+CMD ["bash", "/home/resque/www/start.sh"]

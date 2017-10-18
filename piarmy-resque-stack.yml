@@ -1,4 +1,4 @@
-# `docker stack deploy -c /home/pi/images/piarmy-resque-stack/piarmy-resque-stack.yml piarmy`
+# `docker stack deploy -c /home/pi/projects/piarmy-scripts/swarm/piarmy-resque-stack.yml resque`
 
 version: '3'
 
@@ -19,8 +19,6 @@ services:
       - "6379:6379"
     networks:
       - piarmy
-    volumes:
-      - /home/pi/images/piarmy-resque-stack/redis/containerFiles:/home/redis
 
   resque:
     image: mattwiater/piarmy-resque:latest

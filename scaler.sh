@@ -7,7 +7,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 scriptSleep=5
 
-resqueContainer="resque_piarmy-resque"
+resqueContainer="resque_resque"
 lambdaContainer="piarmy_lambda"
 resqueEndpoint="http://piarmy01:3000/json-api/info"
 
