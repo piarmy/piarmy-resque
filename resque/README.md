@@ -1,7 +1,8 @@
 # piarmy-resque
 
+cd /home/pi/images/piarmy-resque-stack/resque && \
 docker build -t mattwiater/piarmy-resque . && \
-	docker push mattwiater/piarmy-resque
+  docker push mattwiater/piarmy-resque
 
 docker build -t mattwiater/piarmy-resque . && \
   docker run -it --rm  -v /home/pi/images/piarmy-resque-stack/resque/containerFiles:/home/resque/www -p 3000:3000 -e REDIS_DB="piarmy01:6379" --name=piarmy-resque mattwiater/piarmy-resque /bin/bash

@@ -20,8 +20,8 @@ module Resque
 
         beginBatch   = Time.now.to_f
 
-        # Each job takes about 3 seconds to complete
-        jobInterval  = 0.75
+        # Each job takes about 2 seconds to complete
+        jobInterval  = 0.5
         numberOfJobs = 100
 
         puts "Running job batch:"

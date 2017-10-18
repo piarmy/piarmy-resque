@@ -74,13 +74,15 @@ task environment: :before
 
 desc 'Workers'
 task :workers do
+  numberOfWorkers = 4
+
   threads = []
 
   Resque.redis = ENV['REDIS_DB']
 
   ENV["QUEUE"] = "*"
 
-  4.times do
+  numberOfWorkers.times do
     threads << Thread.new do
       system "QUEUE='*' rake environment resque:work"
     end
